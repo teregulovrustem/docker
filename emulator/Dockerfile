@@ -1,4 +1,4 @@
-FROM teregulowrustem/android
+FROM freeway/android
 
 #inspired by Ivan Posokhov <posohof@gmail.com>
 LABEL maintainer="a.zhilyaev73@gmail.com"
