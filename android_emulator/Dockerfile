@@ -23,7 +23,7 @@ RUN cd android && \
     tools/bin/sdkmanager --update
 
 # Add entrypoint
-ADD entrypoint.sh /entrypoint.sh
+ADD android_emulator/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
