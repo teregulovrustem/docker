@@ -1,26 +1,28 @@
-FROM adoptopenjdk/openjdk11:alpine
+FROM adoptopenjdk/openjdk11
 
 LABEL maintainer="teregulowrustem@gmail.com"
 
-ENV ANDROID_APIS="android-30"
-ENV ANDROID_BUILD_TOOLS=31.0.0
-ENV ANDROID_HOME="/opt/android"
+ENV COMPILE_SDK="31"
+ENV BUILD_TOOLS_VERSION 31.0.0
+ENV ANDROID_SDK_ROOT "/opt/android"
 ENV CMDLINE_VERSION "5.0"
 ENV SDK_TOOLS "7583922"
-ENV PATH $PATH:${ANDROID_HOME}/cmdline-tools/${CMDLINE_VERSION}/bin:${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/extras/google/instantapps
+ENV PATH $PATH:${ANDROID_SDK_ROOT}/cmdline-tools/${CMDLINE_VERSION}/bin:${ANDROID_SDK_ROOT}/platform-tools
 
-RUN apk add --no-cache bash git unzip wget && \
-    apk add --virtual .rundeps $runDeps && \
+RUN apt-get update &&  \
+    apt-get install -y bash git unzip wget && \
+    rm -rf /var/lib/apt/lists/* && \
     rm -rf /tmp/* && \
-    rm -rf /var/cache/apk/* && \
     wget -q https://dl.google.com/android/repository/commandlinetools-linux-${SDK_TOOLS}_latest.zip -O /tmp/tools.zip && \
-    mkdir -p ${ANDROID_HOME}/cmdline-tools && \
-    unzip -qq /tmp/tools.zip -d ${ANDROID_HOME}/cmdline-tools && \
-    mv ${ANDROID_HOME}/cmdline-tools/* ${ANDROID_HOME}/cmdline-tools/${CMDLINE_VERSION} && \
+    mkdir -p ${ANDROID_SDK_ROOT}/cmdline-tools && \
+    unzip -qq /tmp/tools.zip -d ${ANDROID_SDK_ROOT}/cmdline-tools && \
+    mv ${ANDROID_SDK_ROOT}/cmdline-tools/* ${ANDROID_SDK_ROOT}/cmdline-tools/${CMDLINE_VERSION} && \
     rm -v /tmp/tools.zip && \
     mkdir -p ~/.android/ && touch ~/.android/repositories.cfg && \
-    yes | sdkmanager --licenses && \
-    sdkmanager "platforms;${ANDROID_APIS}" "platform-tools" "build-tools;${ANDROID_BUILD_TOOLS}" "extras;google;m2repository" && \
+    yes | sdkmanager --sdk_root=${ANDROID_SDK_ROOT} --licenses && \
+    sdkmanager --sdk_root=${ANDROID_SDK_ROOT}  --install "platform-tools" && \
+    sdkmanager --sdk_root="${ANDROID_SDK_ROOT}" --install "build-tools;${BUILD_TOOLS_VERSION}" "platforms;android-${COMPILE_SDK}" && \
+    sdkmanager --sdk_root="${ANDROID_SDK_ROOT}" --uninstall emulator && \
     sdkmanager --update
 
 # Set timezone
